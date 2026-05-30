@@ -12,54 +12,31 @@ import {
 import { Screen } from "@/components/Screen";
 import { StateView } from "@/components/StateView";
 import { useAsync } from "@/hooks/useAsync";
+import qeseh from "@/api/qeseh";
 import { colors } from "@/theme/colors";
 import { spacing } from "@/theme/spacing";
 import { type } from "@/theme/type";
 
 export default function SeriesDetailsScreen() {
-  const { slug } = useLocalSearchParams<{ slug: string }>();
+  const { slug } =
+    useLocalSearchParams<{ slug: string }>();
 
-  const { data, loading } = useAsync(async () => {
-    const tvResponse = await fetch(
-      "https://qeseh.net/wp-json/wp/v2/tvshow?per_page=100"
-    );
-
-    const tvshows = await tvResponse.json();
-
-    const currentSeries = tvshows.find(
-      (item: any) => item.slug === slug
-    );
-
-    if (!currentSeries) return null;
-
-    const episodesResponse = await fetch(
-      `https://qeseh.net/wp-json/wp/v2/posts?tvshow=${currentSeries.id}&per_page=100`
-    );
-
-    const episodes = await episodesResponse.json();
-
-    const imageMatch =
-      currentSeries.description?.match(
-        /src="([^"]+\.(jpg|jpeg|png|webp))/i
+  const { data, loading } = useAsync(
+    async () => {
+      return await qeseh.getSeriesDetails(
+        slug || ""
       );
-
-    return {
-      id: currentSeries.id,
-      title: currentSeries.name,
-      slug: currentSeries.slug,
-      poster: imageMatch?.[1] || "",
-      description:
-        currentSeries.description
-          ?.replace(/<[^>]+>/g, "")
-          ?.trim() || "",
-      episodes,
-    };
-  }, [slug]);
+    },
+    [slug]
+  );
 
   if (loading) {
     return (
       <Screen>
-        <StateView loading title="Chargement..." />
+        <StateView
+          loading
+          title="Chargement..."
+        />
       </Screen>
     );
   }
@@ -77,21 +54,29 @@ export default function SeriesDetailsScreen() {
 
   return (
     <Screen
-      title={data.title}
+      title={data.arabicTitle}
       subtitle={`${data.episodes.length} épisodes`}
     >
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.container}>
           {data.poster ? (
             <Image
-              source={{ uri: data.poster }}
+              source={{
+                uri: data.poster,
+              }}
               style={styles.poster}
             />
           ) : null}
 
-          <Text style={styles.description}>
-            {data.description}
-          </Text>
+          {!!data.description && (
+            <Text
+              style={styles.description}
+            >
+              {data.description}
+            </Text>
+          )}
 
           <View style={styles.stats}>
             <View style={styles.stat}>
@@ -100,12 +85,14 @@ export default function SeriesDetailsScreen() {
               </Text>
 
               <Text style={styles.label}>
-                Épisodes
+                Episodes
               </Text>
             </View>
 
             <View style={styles.stat}>
-              <Text style={styles.value}>1</Text>
+              <Text style={styles.value}>
+                1
+              </Text>
 
               <Text style={styles.label}>
                 Saison
@@ -113,34 +100,70 @@ export default function SeriesDetailsScreen() {
             </View>
           </View>
 
-          <Text style={styles.sectionTitle}>
-            Épisodes
+          <Text
+            style={styles.sectionTitle}
+          >
+            Episodes
           </Text>
 
-          {data.episodes.map((episode: any) => (
-            <Link
-              key={episode.id}
-              asChild
-              href={{
-                pathname: "/episode/[slug]",
-                params: {
-                  slug: String(episode.id),
-                },
-              }}
-            >
-              <Pressable style={styles.episodeCard}>
-                <Text style={styles.episodeTitle}>
-                  {episode.title.rendered}
-                </Text>
+          {data.episodes.map(
+            (episode) => (
+              <Link
+                key={episode.slug}
+                asChild
+                href={{
+                  pathname:
+                    "/episode/[slug]",
+                  params: {
+                    slug:
+                      episode.slug,
+                  },
+                }}
+              >
+                <Pressable
+                  style={
+                    styles.episodeCard
+                  }
+                >
+                  <View
+                    style={
+                      styles.episodeLeft
+                    }
+                  >
+                    <Text
+                      style={
+                        styles.episodeNumber
+                      }
+                    >
+                      EP{" "}
+                      {
+                        episode.episodeNumber
+                      }
+                    </Text>
 
-                <Text style={styles.episodeDate}>
-                  {new Date(
-                    episode.date
-                  ).toLocaleDateString()}
-                </Text>
-              </Pressable>
-            </Link>
-          ))}
+                    <Text
+                      style={
+                        styles.episodeTitle
+                      }
+                    >
+                      {episode.title}
+                    </Text>
+                  </View>
+
+                  {episode.thumbnail ? (
+                    <Image
+                      source={{
+                        uri: episode.thumbnail,
+                      }}
+                      style={
+                        styles.thumbnail
+                      }
+                    />
+                  ) : null}
+                </Pressable>
+              </Link>
+            )
+          )}
         </View>
       </ScrollView>
     </Screen>
@@ -154,8 +177,8 @@ const styles = StyleSheet.create({
 
   poster: {
     width: "100%",
-    height: 250,
-    borderRadius: 12,
+    height: 260,
+    borderRadius: 14,
   },
 
   description: {
@@ -170,10 +193,13 @@ const styles = StyleSheet.create({
 
   stat: {
     flex: 1,
-    backgroundColor: colors.surface,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: colors.hairline,
+    backgroundColor:
+      colors.surface,
     borderRadius: 12,
+    borderWidth:
+      StyleSheet.hairlineWidth,
+    borderColor:
+      colors.hairline,
     padding: spacing.md,
   },
 
@@ -194,11 +220,28 @@ const styles = StyleSheet.create({
   },
 
   episodeCard: {
-    backgroundColor: colors.surface,
+    backgroundColor:
+      colors.surface,
     borderRadius: 12,
+    borderWidth:
+      StyleSheet.hairlineWidth,
+    borderColor:
+      colors.hairline,
     padding: spacing.md,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: colors.hairline,
+    flexDirection: "row",
+    justifyContent:
+      "space-between",
+    alignItems: "center",
+  },
+
+  episodeLeft: {
+    flex: 1,
+    gap: spacing.xs,
+  },
+
+  episodeNumber: {
+    ...type.caption,
+    color: colors.accent,
   },
 
   episodeTitle: {
@@ -206,9 +249,10 @@ const styles = StyleSheet.create({
     color: colors.text,
   },
 
-  episodeDate: {
-    ...type.caption,
-    color: colors.muted,
-    marginTop: spacing.xs,
+  thumbnail: {
+    width: 90,
+    height: 55,
+    borderRadius: 8,
+    marginLeft: spacing.sm,
   },
 });

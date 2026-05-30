@@ -28,9 +28,8 @@ type HomeData = {
 
 async function loadHome(): Promise<HomeData> {
   try {
-    // Séries
     const tvResponse = await fetch(
-      "https://qeseh.net/wp-json/wp/v2/tvshow?per_page=20"
+      "https://qeseh.net/wp-json/wp/v2/tvshow?per_page=50"
     );
 
     const tvshows = await tvResponse.json();
@@ -46,23 +45,22 @@ async function loadHome(): Promise<HomeData> {
         title: item.name,
         poster: imageMatch?.[1] || "",
         genre: "Turkish Drama",
-        year: "2026",
+        year: "",
       };
     });
 
-    // Episodes récents
-    const epResponse = await fetch(
+    const postsResponse = await fetch(
       "https://qeseh.net/wp-json/wp/v2/posts?per_page=20"
     );
 
-    const posts = await epResponse.json();
+    const posts = await postsResponse.json();
 
     const episodes = posts.map((post: any) => ({
       slug: post.slug,
       title: post.title?.rendered || "",
       description:
         post.excerpt?.rendered
-          ?.replace(/<[^>]*>/g, "")
+          ?.replace(/<[^>]+>/g, "")
           ?.trim() || "",
     }));
 
@@ -71,7 +69,7 @@ async function loadHome(): Promise<HomeData> {
       episodes,
     };
   } catch (error) {
-    console.log("API ERROR:", error);
+    console.log(error);
 
     return {
       series: [],
@@ -81,29 +79,39 @@ async function loadHome(): Promise<HomeData> {
 }
 
 export default function HomeScreen() {
-  const { data, loading, reload } = useAsync(loadHome, []);
+  const { data, loading, reload } =
+    useAsync(loadHome, []);
 
   return (
     <Screen
-      title="Filmieo"
-      subtitle="Series, episodes recents et lecteurs autorises."
+      title="Filmeio"
+      subtitle="Series Turques"
     >
       {loading ? (
-        <StateView loading title="Chargement du catalogue" />
+        <StateView
+          loading
+          title="Chargement..."
+        />
       ) : (
         <View style={styles.stack}>
-          <SectionHeader title="Dernieres series" />
+          <SectionHeader
+            title="Dernieres series"
+          />
 
           <ScrollView
             horizontal
-            showsHorizontalScrollIndicator={false}
+            showsHorizontalScrollIndicator={
+              false
+            }
           >
-            {(data?.series ?? []).map((series) => (
-              <PosterCard
-                key={series.slug}
-                series={series as any}
-              />
-            ))}
+            {(data?.series ?? []).map(
+              (series) => (
+                <PosterCard
+                  key={series.slug}
+                  series={series as any}
+                />
+              )
+            )}
           </ScrollView>
 
           <SectionHeader
@@ -112,19 +120,21 @@ export default function HomeScreen() {
           />
 
           <View style={styles.list}>
-            {(data?.episodes ?? []).map((episode) => (
-              <EpisodeRow
-                key={episode.slug}
-                episode={episode as any}
-              />
-            ))}
+            {(data?.episodes ?? []).map(
+              (episode) => (
+                <EpisodeRow
+                  key={episode.slug}
+                  episode={episode as any}
+                />
+              )
+            )}
           </View>
 
           {!data?.series.length &&
           !data?.episodes.length ? (
             <StateView
               title="Catalogue vide"
-              message="Aucune donnee disponible pour le moment."
+              message="Aucune donnee disponible."
               icon="cloud-offline-outline"
               actionLabel="Recharger"
               onAction={reload}

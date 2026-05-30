@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "Filmieo",
-    "slug": "filmieo",
-    "scheme": "filmieo",
+    "name": "Filmeio",
+    "slug": "filmeio",
+    "scheme": "filmeio",
     "version": "1.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "automatic",
@@ -12,7 +12,7 @@
       "bundleIdentifier": "com.filmieo.app"
     },
     "android": {
-      "package": "com.filmieo.app",
+      "package": "com.filmeio.app",
       "adaptiveIcon": {
         "backgroundColor": "#F7F7F2"
       }
@@ -23,7 +23,8 @@
     },
     "plugins": [
       "expo-router",
-      "expo-asset"
+      "expo-asset",
+      "expo-video"
     ],
     "experiments": {
       "typedRoutes": true

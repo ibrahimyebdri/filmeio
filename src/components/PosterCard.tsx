@@ -1,5 +1,12 @@
 import { Link } from "expo-router";
-import { Image, Pressable, StyleSheet, Text, View } from "react-native";
+import {
+  Image,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+
 import { colors } from "@/theme/colors";
 import { spacing } from "@/theme/spacing";
 import { type } from "@/theme/type";
@@ -14,35 +21,53 @@ type PosterCardProps = {
   };
 };
 
-export function PosterCard({ series }: PosterCardProps) {
+export function PosterCard({
+  series,
+}: PosterCardProps) {
   return (
     <Link
       asChild
       href={{
         pathname: "/series/[slug]",
-        params: { slug: series.slug }
+        params: {
+          slug: String(series.slug),
+        },
       }}
     >
-      <Pressable accessibilityRole="button" style={styles.card}>
+      <Pressable
+        accessibilityRole="button"
+        style={styles.card}
+      >
         <View style={styles.poster}>
           {series.poster ? (
             <Image
-              source={{ uri: series.poster }}
+              source={{
+                uri: series.poster,
+              }}
               style={styles.image}
               resizeMode="cover"
             />
           ) : (
-            <Text numberOfLines={2} style={styles.placeholder}>
+            <Text
+              numberOfLines={2}
+              style={styles.placeholder}
+            >
               {series.title}
             </Text>
           )}
         </View>
 
-        <Text numberOfLines={2} style={styles.title}>
+        <Text
+          numberOfLines={2}
+          style={styles.title}
+        >
           {series.title}
         </Text>
 
-        <Text numberOfLines={1} style={styles.meta}>
+        <Text
+          numberOfLines={1}
+          style={styles.meta}
+        >
           {[series.year, series.genre]
             .filter(Boolean)
             .join(" · ") || "Série"}
@@ -55,41 +80,44 @@ export function PosterCard({ series }: PosterCardProps) {
 const styles = StyleSheet.create({
   card: {
     width: 150,
-    marginRight: spacing.md
+    marginRight: spacing.md,
   },
 
   poster: {
     aspectRatio: 0.72,
     borderRadius: 12,
     overflow: "hidden",
-    backgroundColor: colors.surfaceAlt,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: colors.hairline,
+    backgroundColor:
+      colors.surfaceAlt,
+    borderWidth:
+      StyleSheet.hairlineWidth,
+    borderColor:
+      colors.hairline,
     justifyContent: "center",
-    alignItems: "center"
+    alignItems: "center",
   },
 
   image: {
     width: "100%",
-    height: "100%"
+    height: "100%",
   },
 
   placeholder: {
     ...type.headline,
     color: colors.muted,
     textAlign: "center",
-    padding: spacing.md
+    padding: spacing.md,
   },
 
   title: {
     ...type.headline,
     color: colors.text,
-    marginTop: spacing.sm
+    marginTop: spacing.sm,
   },
 
   meta: {
     ...type.caption,
     color: colors.muted,
-    marginTop: spacing.xs
-  }
+    marginTop: spacing.xs,
+  },
 });

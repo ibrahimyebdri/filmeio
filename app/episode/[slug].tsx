@@ -1,16 +1,11 @@
-import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams } from "expo-router";
-import {
-  Linking,
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { StyleSheet, View, Text } from "react-native";
+import { WebView } from "react-native-webview";
 
 import { Screen } from "@/components/Screen";
 import { StateView } from "@/components/StateView";
 import { useAsync } from "@/hooks/useAsync";
+import qeseh from "@/api/qeseh";
 import { colors } from "@/theme/colors";
 import { spacing } from "@/theme/spacing";
 import { type } from "@/theme/type";
@@ -19,28 +14,14 @@ export default function EpisodeDetailsScreen() {
   const { slug } =
     useLocalSearchParams<{ slug: string }>();
 
-  const { data, loading } = useAsync(async () => {
-    const response = await fetch(
-      `https://qeseh.net/wp-json/wp/v2/posts/${slug}`
-    );
-
-    const episode = await response.json();
-
-    return {
-      id: episode.id,
-
-      title:
-        episode.title?.rendered ||
-        "Episode",
-
-      description:
-        episode.content?.rendered
-          ?.replace(/<[^>]+>/g, "")
-          ?.trim() || "",
-
-      url: episode.link,
-    };
-  }, [slug]);
+  const { data, loading } = useAsync(
+    async () => {
+      return await qeseh.getEpisodeDetails(
+        slug || ""
+      );
+    },
+    [slug]
+  );
 
   if (loading) {
     return (
@@ -64,41 +45,60 @@ export default function EpisodeDetailsScreen() {
     );
   }
 
+  const server =
+    data.servers.find(
+      (s) => s.name === "estream"
+    ) ||
+    data.servers.find(
+      (s) => s.name === "Arab HD"
+    );
+
+  if (!server) {
+    return (
+      <Screen title={data.title}>
+        <StateView
+          icon="videocam-off-outline"
+          title="Vidéo introuvable"
+          message="Aucun serveur disponible."
+        />
+      </Screen>
+    );
+  }
+
   return (
     <Screen
       title={data.title}
-      subtitle="Filmieo"
+      subtitle={data.seriesTitle}
+      scroll={false}
     >
-      <View style={styles.stack}>
-        <Text style={styles.description}>
-          {data.description}
-        </Text>
-
-        <View style={styles.player}>
-          <Ionicons
-            color={colors.accent}
-            name="play-circle-outline"
-            size={70}
-          />
-
-          <Text style={styles.playerTitle}>
-            Regarder l'épisode
-          </Text>
-
-          <Text style={styles.playerText}>
-            Ouvrir l'épisode sur Qeseh.
-          </Text>
-
-          <Pressable
-            style={styles.watchButton}
-            onPress={() =>
-              Linking.openURL(data.url)
+      <View style={styles.container}>
+        <View style={styles.playerContainer}>
+          <WebView
+            source={{
+              uri: server.iframeUrl,
+            }}
+            style={styles.webview}
+            javaScriptEnabled
+            domStorageEnabled
+            allowsFullscreenVideo
+            mediaPlaybackRequiresUserAction={
+              false
             }
-          >
-            <Text style={styles.watchText}>
-              Regarder maintenant
-            </Text>
-          </Pressable>
+            allowsInlineMediaPlayback
+            startInLoadingState
+          />
+        </View>
+
+        <View style={styles.info}>
+          <Text style={styles.serverName}>
+            Serveur : {server.name}
+          </Text>
+
+          <Text style={styles.description}>
+            {
+              data.seriesDescription
+            }
+          </Text>
         </View>
       </View>
     </Screen>
@@ -106,51 +106,34 @@ export default function EpisodeDetailsScreen() {
 }
 
 const styles = StyleSheet.create({
-  stack: {
-    gap: spacing.lg,
+  container: {
+    flex: 1,
+  },
+
+  playerContainer: {
+    height: 280,
+    borderRadius: 12,
+    overflow: "hidden",
+    backgroundColor: "#000",
+  },
+
+  webview: {
+    flex: 1,
+    backgroundColor: "#000",
+  },
+
+  info: {
+    paddingTop: spacing.md,
+    gap: spacing.sm,
+  },
+
+  serverName: {
+    ...type.headline,
+    color: colors.text,
   },
 
   description: {
     ...type.body,
-    color: colors.text,
-  },
-
-  player: {
-    alignItems: "center",
-    justifyContent: "center",
-    gap: spacing.md,
-    minHeight: 260,
-
-    backgroundColor: colors.surface,
-    borderRadius: 12,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: colors.hairline,
-
-    padding: spacing.xl,
-  },
-
-  playerTitle: {
-    ...type.title,
-    color: colors.text,
-    textAlign: "center",
-  },
-
-  playerText: {
-    ...type.body,
     color: colors.muted,
-    textAlign: "center",
-  },
-
-  watchButton: {
-    backgroundColor: colors.accent,
-    paddingHorizontal: spacing.xl,
-    paddingVertical: spacing.md,
-    borderRadius: 12,
-  },
-
-  watchText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "700",
   },
 });
