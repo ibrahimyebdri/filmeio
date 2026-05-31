@@ -5,6 +5,7 @@ import {
   StyleSheet,
   Text,
   View,
+  DimensionValue,
 } from "react-native";
 
 import { colors } from "@/theme/colors";
@@ -12,79 +13,85 @@ import { spacing } from "@/theme/spacing";
 import { type } from "@/theme/type";
 
 type PosterCardProps = {
-  series: {
-    slug: string;
-    title: string;
-    poster?: string;
-    year?: string;
-    genre?: string;
-  };
+  title: string;
+  poster?: string;
+  subtitle?: string;
+  href?: any;
+  onPress?: () => void;
+  width?: DimensionValue;
+  aspectRatio?: number;
+  marginRight?: number;
 };
 
 export function PosterCard({
-  series,
+  title,
+  poster,
+  subtitle,
+  href,
+  onPress,
+  width = 120,
+  aspectRatio = 0.72,
+  marginRight = spacing.md,
 }: PosterCardProps) {
-  return (
-    <Link
-      asChild
-      href={{
-        pathname: "/series/[slug]",
-        params: {
-          slug: String(series.slug),
-        },
-      }}
+  const content = (
+    <Pressable
+      accessibilityRole="button"
+      onPress={onPress}
+      style={StyleSheet.flatten([styles.card, { width, marginRight }])}
     >
-      <Pressable
-        accessibilityRole="button"
-        style={styles.card}
+      <View style={[styles.poster, { aspectRatio }]}>
+        {poster ? (
+          <Image
+            source={{
+              uri: poster,
+            }}
+            style={styles.image}
+            resizeMode="cover"
+          />
+        ) : (
+          <Text
+            numberOfLines={2}
+            style={styles.placeholder}
+          >
+            {title}
+          </Text>
+        )}
+      </View>
+
+      <Text
+        numberOfLines={2}
+        style={styles.title}
       >
-        <View style={styles.poster}>
-          {series.poster ? (
-            <Image
-              source={{
-                uri: series.poster,
-              }}
-              style={styles.image}
-              resizeMode="cover"
-            />
-          ) : (
-            <Text
-              numberOfLines={2}
-              style={styles.placeholder}
-            >
-              {series.title}
-            </Text>
-          )}
-        </View>
+        {title}
+      </Text>
 
-        <Text
-          numberOfLines={2}
-          style={styles.title}
-        >
-          {series.title}
-        </Text>
-
+      {subtitle ? (
         <Text
           numberOfLines={1}
           style={styles.meta}
         >
-          {[series.year, series.genre]
-            .filter(Boolean)
-            .join(" · ") || "Série"}
+          {subtitle}
         </Text>
-      </Pressable>
-    </Link>
+      ) : null}
+    </Pressable>
   );
+
+  if (href) {
+    return (
+      <Link asChild href={href}>
+        {content}
+      </Link>
+    );
+  }
+
+  return content;
 }
 
 const styles = StyleSheet.create({
   card: {
-    width: 150,
-    marginRight: spacing.md,
   },
 
   poster: {
-    aspectRatio: 0.72,
     borderRadius: 12,
     overflow: "hidden",
     backgroundColor:

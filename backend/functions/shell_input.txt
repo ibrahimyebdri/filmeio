@@ -1,0 +1,4 @@
+latestEpisodes()
+getEpisode({query:{slug:'yeralti-episode-16'}})
+getSeries({query:{slug:'abqari-kntvs'}})
+searchSeries({query:{q:'abqari'}})

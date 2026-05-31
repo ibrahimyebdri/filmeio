@@ -76,13 +76,13 @@ export const mockEpisodeDetails = (slug: string): EpisodeDetails => {
         name: "Arab HD",
         host: "arabhd.onl",
         quality: "HD",
-        embedUrl: "https://arabhd.onl/embed-demo.html"
+        iframeUrl: "https://arabhd.onl/embed-demo.html"
       },
       {
         name: "estream",
         host: "arabveturk.com",
         quality: "HD",
-        embedUrl: "https://arabveturk.com/embed-demo.html"
+        iframeUrl: "https://arabveturk.com/embed-demo.html"
       }
     ]
   };

@@ -16,6 +16,7 @@ type ScreenProps =
     title?: string;
     subtitle?: string;
     scroll?: boolean;
+    rightAction?: React.ReactNode;
   }>;
 
 export function Screen({
@@ -23,24 +24,33 @@ export function Screen({
   title,
   subtitle,
   scroll = true,
+  rightAction,
 }: ScreenProps) {
   const content = (
     <View style={styles.content}>
-      {(title || subtitle) && (
+      {(title || subtitle || rightAction) && (
         <View style={styles.header}>
-          {title ? (
-            <Text style={styles.title}>
-              {title}
-            </Text>
-          ) : null}
+          <View style={styles.titleContainer}>
+            {title ? (
+              <Text style={styles.title}>
+                {title}
+              </Text>
+            ) : null}
 
-          {subtitle ? (
-            <Text
-              style={styles.subtitle}
-            >
-              {subtitle}
-            </Text>
-          ) : null}
+            {subtitle ? (
+              <Text
+                style={styles.subtitle}
+              >
+                {subtitle}
+              </Text>
+            ) : null}
+          </View>
+          
+          {rightAction && (
+            <View style={styles.rightAction}>
+              {rightAction}
+            </View>
+          )}
         </View>
       )}
 
@@ -97,9 +107,22 @@ const styles = StyleSheet.create({
   },
 
   header: {
-    gap: spacing.xs,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
     marginBottom:
-      spacing.xl,
+      spacing.md,
+  },
+
+  titleContainer: {
+    flex: 1,
+    gap: spacing.xs,
+  },
+
+  rightAction: {
+    marginLeft: spacing.md,
+    justifyContent: "center",
+    alignItems: "center",
   },
 
   title: {

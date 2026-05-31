@@ -19,7 +19,7 @@ export type EpisodeSummary = {
 
 export type StreamServer = {
   name: string;
-  embedUrl: string;
+  iframeUrl: string;
   host?: string;
   quality?: string;
 };

@@ -36,10 +36,10 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="admin"
+        name="favorites"
         options={{
-          title: "Admin",
-          tabBarIcon: ({ color }) => <TabIcon color={color} name="server-outline" />
+          title: "Favoris",
+          tabBarIcon: ({ color }) => <TabIcon color={color} name="heart-outline" />
         }}
       />
     </Tabs>
