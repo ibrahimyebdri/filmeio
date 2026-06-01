@@ -147,7 +147,7 @@ export default function EpisodeDetailsScreen() {
             <iframe
               src={server.iframeUrl}
               style={{ width: "100%", height: "100%", border: "none" }}
-              allowFullScreen
+              allow="autoplay; fullscreen; picture-in-picture"
               referrerPolicy="no-referrer"
             />
           ) : (
@@ -284,11 +284,14 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 4,
   },
-  playerContainer: {
-    width: "100%",
-    height: Platform.OS === 'web' ? 500 : VIDEO_HEIGHT,
-    backgroundColor: '#000',
-  },
+playerContainer: {
+  width: "100%",
+  maxWidth: 1000, // ou 900, 1100 selon ton goût
+  height: VIDEO_HEIGHT,
+   maxHeight: 500, // ou 900, 1100 selon ton goût
+  backgroundColor: "#000",
+  alignSelf: "center",
+},
   webview: {
     flex: 1,
     backgroundColor: '#000',
