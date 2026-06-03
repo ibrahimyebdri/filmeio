@@ -11,20 +11,24 @@ import { HistoryProvider } from "@/context/HistoryContext";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 
+// Prevent auto-hide so the splash screen stays while fonts load
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  const [fontsLoaded] = useFonts({
+  const [fontsLoaded, fontError] = useFonts({
     ...Ionicons.font,
   });
 
   useEffect(() => {
-    if (fontsLoaded) {
+    if (fontsLoaded || fontError) {
+      if (fontError) {
+        console.error("Error loading fonts:", fontError);
+      }
       SplashScreen.hideAsync();
     }
-  }, [fontsLoaded]);
+  }, [fontsLoaded, fontError]);
 
-  if (!fontsLoaded) {
+  if (!fontsLoaded && !fontError) {
     return null;
   }
 

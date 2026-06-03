@@ -1,93 +1,108 @@
-# Filmieo
+<div align="center">
+  
+  # 🎬 Filmeio
 
-Projet Expo SDK 52 avec une application mobile/web minimaliste et un backend Firebase Cloud Functions.
+  **Votre plateforme de streaming ultime (Web & Mobile)**
 
-## Stack
+  [![Expo](https://img.shields.io/badge/Expo-1C1E24?style=for-the-badge&logo=expo&logoColor=white)](https://expo.dev/)
+  [![React Native](https://img.shields.io/badge/React_Native-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://reactnative.dev/)
+  [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+  [![Firebase](https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)](https://firebase.google.com/)
 
-- Expo SDK 52
-- Expo Router
-- React Native 0.76
-- TypeScript
-- Firebase Functions v2
-- Firestore cache
-- Cheerio pour parser les pages HTML cote backend
+</div>
 
-## Installation
+---
 
-Les dependances sont deja installees dans ce dossier. Sur Windows PowerShell, utilise `npm.cmd` si `npm` est bloque par la politique d'execution.
+## 📖 À propos du projet
 
-```powershell
-npm.cmd install
-npm.cmd --prefix backend/functions install
+**Filmeio** est une application moderne, rapide et multiplateforme qui permet aux utilisateurs de découvrir, de rechercher et de regarder leurs séries et films préférés. 
+
+Dotée d'une interface utilisateur élégante et fluide, Filmeio propose une expérience utilisateur premium. Le projet est alimenté par un backend robuste basé sur Firebase Cloud Functions qui s'occupe de l'agrégation de contenu en temps réel.
+
+### ✨ Fonctionnalités principales :
+- **Exploration de contenu :** Parcourez les derniers épisodes et les séries du moment.
+- **Moteur de recherche intelligent :** Trouvez rapidement la série que vous désirez.
+- **Favoris :** Sauvegardez vos séries et films préférés pour y accéder en un clic.
+- **Historique de visionnage :** Reprenez la lecture exactement là où vous vous étiez arrêté.
+- **Cross-platform :** Disponible sur Android, iOS et sur le Web.
+
+---
+
+## 🚀 Tester l'application
+
+Vous pouvez tester Filmeio dès maintenant sans rien installer, ou télécharger la version mobile Android :
+
+🌍 **Version Web :** [filmeio.expo.app](https://filmeio.expo.app)  
+📱 **Version Android (APK) :** [Télécharger sur Google Drive](https://drive.google.com/444m)
+
+---
+
+## 🛠️ Technologies utilisées
+
+- **Frontend :** React Native 0.76, Expo SDK 52, Expo Router
+- **Backend :** Firebase Functions v2, Firestore (Cache)
+- **Langage :** TypeScript
+- **Web Scraping :** Cheerio
+- **Styles :** Expo, Design System sur-mesure
+- **Icônes :** Ionicons (@expo/vector-icons)
+
+---
+
+## 💻 Installation en local
+
+Si vous souhaitez faire tourner le projet sur votre propre machine, suivez ces instructions.
+
+### 1. Cloner et installer les dépendances
+
+Assurez-vous d'avoir Node.js installé. Dans Windows PowerShell, lancez :
+
+```bash
+# Installation des dépendances front-end
+npm install
+
+# Installation des dépendances back-end
+npm --prefix backend/functions install
 ```
 
-## Lancer l'application
+### 2. Démarrer le Backend Firebase (Local)
 
-```powershell
-npm.cmd run start
+Pour tester l'application avec des données, vous devez lancer les émulateurs Firebase :
+
+```bash
+npm run backend:build
+npm run backend:serve
 ```
 
-Pour le web:
+L'API sera disponible sur `http://localhost:5001/filmieo-mock/us-central1`.
+*(Pensez à configurer votre fichier `.env` avec cette URL dans la variable `EXPO_PUBLIC_API_BASE_URL`)*.
 
-```powershell
-npm.cmd run web
+### 3. Démarrer l'application (Frontend)
+
+```bash
+# Lancer le serveur de développement Expo
+npm run start
+
+# Ou lancer directement la version web
+npm run web
+
+# Construire/lancer sur Android (Bare workflow / Prebuild)
+npx expo run:android -d
 ```
 
-## Backend Firebase local
+---
 
-```powershell
-npm.cmd run backend:build
-npm.cmd run backend:serve
-```
+## 📡 API Endpoints (Backend)
 
-URL locale:
+Le backend offre plusieurs points d'entrée sécurisés :
+- `GET /latestSeries` : Récupère les séries récentes.
+- `GET /latestEpisodes` : Récupère les derniers épisodes.
+- `GET /searchSeries?q=<query_text>` : Recherche.
+- `GET /getSeries?slug=<series_slug>` : Détails d'une série.
+- `GET /getEpisode?slug=<episode_slug>` : Détails d'un épisode (et lecteurs vidéo).
+- `GET /proxyHtml?url=<target_url>` : Contournement CORS pour le web.
 
-```text
-http://localhost:5001/filmieo-mock/us-central1
-```
+---
 
-Sur un telephone physique Expo Go, remplace `localhost` par l'adresse IP locale de ton ordinateur:
-
-```text
-http://<HOST_IP>:5001/filmieo-mock/us-central1
-```
-
-Puis cree un fichier `.env` a partir de `.env.example`:
-
-```powershell
-Copy-Item .env.example .env
-```
-
-Et modifie:
-
-```text
-EXPO_PUBLIC_API_BASE_URL=http://<HOST_IP>:5001/filmieo-mock/us-central1
-```
-
-## Endpoints inclus
-
-- `GET /latestSeries`
-- `GET /latestEpisodes`
-- `GET /searchSeries?q=<query_text>`
-- `GET /getSeries?slug=<series_slug>`
-- `GET /getEpisode?slug=<episode_slug>`
-- `GET /proxyHtml?url=<target_url>`
-- `GET /scrapeCron`
-
-## Verification
-
-Commandes passees:
-
-```powershell
-npm.cmd run typecheck
-npm.cmd run lint
-npm.cmd --prefix backend/functions run build
-npx.cmd expo export --platform web
-```
-
-## Notes de production
-
-- Garde le scraping et le proxy cote backend pour eviter d'exposer cette logique au client.
-- `proxyHtml` limite volontairement les domaines autorises.
-- Les lecteurs video sont filtres par domaines autorises dans `backend/functions/src/index.ts`.
-- Utilise uniquement des sources et serveurs pour lesquels tu as les droits necessaires.
+<div align="center">
+  <i>Développé avec passion 💻🎬</i>
+</div>

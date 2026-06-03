@@ -45,7 +45,7 @@ export default function EpisodeDetailsScreen() {
   const { isFavorite, addFavorite, removeFavorite } = useFavorites();
   const { addToHistory, updateProgress, getHistoryItem } = useHistory();
   const webviewRef = useRef<any>(null);
-  
+
   // Server Selection
   const [selectedServerName, setSelectedServerName] = useState<string | null>(null);
 
@@ -62,9 +62,9 @@ export default function EpisodeDetailsScreen() {
 
       // Select default server
       if (!selectedServerName && data.servers.length > 0) {
-        const defaultServer = data.servers.find(s => s.name === "estream") 
-                           || data.servers.find(s => s.name === "Arab HD") 
-                           || data.servers[0];
+        const defaultServer = data.servers.find(s => s.name === "estream")
+          || data.servers.find(s => s.name === "Arab HD")
+          || data.servers[0];
         if (defaultServer) {
           setSelectedServerName(defaultServer.name);
         }
@@ -201,7 +201,7 @@ export default function EpisodeDetailsScreen() {
                   if (msg.type === 'progress' && msg.progress > 0) {
                     updateProgress(data.slug, msg.progress);
                   }
-                } catch (e) {}
+                } catch (e) { }
               }}
             />
           )}
@@ -229,10 +229,10 @@ export default function EpisodeDetailsScreen() {
                       style={[styles.serverPill, isActive && styles.serverPillActive]}
                       onPress={() => setSelectedServerName(srv.name)}
                     >
-                      <Ionicons 
-                        name={isActive ? "play-circle" : "cloud-outline"} 
-                        size={16} 
-                        color={isActive ? colors.surface : colors.muted} 
+                      <Ionicons
+                        name={isActive ? "play-circle" : "cloud-outline"}
+                        size={16}
+                        color={isActive ? colors.surface : colors.muted}
                       />
                       <Text style={[styles.serverText, isActive && styles.serverTextActive]}>
                         {srv.name}
@@ -284,14 +284,14 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 4,
   },
-playerContainer: {
-  width: "100%",
-  maxWidth: 1000, // ou 900, 1100 selon ton goût
-  height: VIDEO_HEIGHT,
-   maxHeight: 500, // ou 900, 1100 selon ton goût
-  backgroundColor: "#000",
-  alignSelf: "center",
-},
+  playerContainer: {
+    width: "100%",
+    maxWidth: 1000, // ou 900, 1100 selon ton goût
+    height: VIDEO_HEIGHT,
+    // ou 900, 1100 selon ton goût
+    backgroundColor: "#000",
+    alignSelf: "center",
+  },
   webview: {
     flex: 1,
     backgroundColor: '#000',
