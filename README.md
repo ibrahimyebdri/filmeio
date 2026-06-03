@@ -1,6 +1,6 @@
 <div align="center">
   
-  # 🎬 Filmeio
+  #  Filmeio
 
   **Votre plateforme de streaming ultime (Web & Mobile)**
 
